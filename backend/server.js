@@ -21,11 +21,19 @@ connectDB().catch(err => {
   process.exit(1);
 });
 
-// Middleware
-app.use(cors({ 
-  origin: ['http://localhost:3000', 'https://thefolio-tau-two.vercel.app','https://thefolio.vercel.app'], 
-  credentials: true 
+// ========== UPDATED CORS CONFIGURATION ==========
+// Allow all origins for testing (pinakasimple at siguradong gagana)
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+// ================================================
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -70,6 +78,7 @@ const server = app.listen(PORT, () => {
   console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 API Base URL: http://localhost:${PORT}/api\n`);
+  console.log(`✅ CORS configured to accept requests from any origin`);
 });
 
 // Handle graceful shutdown
