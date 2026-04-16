@@ -23,7 +23,7 @@ connectDB().catch(err => {
 
 // Middleware
 app.use(cors({ 
-  origin: ['http://localhost:3000','https://thefolio.vercel.app'], 
+  origin: ['http://localhost:3000', 'https://thefolio-tau-two.vercel.app','https://thefolio.vercel.app'], 
   credentials: true 
 }));
 app.use(express.json());
