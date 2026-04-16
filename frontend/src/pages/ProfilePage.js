@@ -16,6 +16,13 @@ const ProfilePage = () => {
   const [msgType, setMsgType] = useState('success');
   const [loading, setLoading] = useState(false);
 
+  // Helper function para kumuha ng profile picture URL (gumagana sa local at production)
+  const getProfilePicUrl = (filename) => {
+    if (!filename) return null;
+    const baseUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    return `${baseUrl}/uploads/${filename}`;
+  };
+
   // Get initial ng pangalan
   const getInitial = (name) => {
     if (!name) return '?';
@@ -128,7 +135,8 @@ const ProfilePage = () => {
   };
 
   const hasProfilePic = user?.profilePic && user.profilePic !== '';
-  const profilePicSrc = hasProfilePic ? `http://localhost:5000/uploads/${user.profilePic}` : null;
+  // UPDATED: Gamitin ang helper function para sa profile picture URL
+  const profilePicSrc = hasProfilePic ? getProfilePicUrl(user.profilePic) : null;
 
   return (
     <div className="app-container">
@@ -150,6 +158,9 @@ const ProfilePage = () => {
                   objectFit: 'cover',
                   border: '4px solid #d81b60',
                   boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
+                }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
                 }}
               />
             ) : (
@@ -267,6 +278,7 @@ const ProfilePage = () => {
             textAlign: 'left'
           }}>
             <h3 style={{ marginBottom: '15px', color: '#d81b60' }}>Account Information</h3>
+            <p><strong>📧 Email:</strong> {user?.email}</p>
             <p><strong>👤 Account Type:</strong> 
               <span style={{ 
                 background: getAccountTypeColor(user?.accountType || user?.role),
@@ -279,6 +291,8 @@ const ProfilePage = () => {
                 {user?.accountType || user?.role || 'Basic'}
               </span>
             </p>
+            <p><strong>⚥ Gender:</strong> {user?.gender ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1) : 'N/A'}</p>
+            <p><strong>🎂 Birthday:</strong> {user?.birthday ? new Date(user.birthday).toLocaleDateString() : 'N/A'}</p>
             <p><strong>📅 Member Since:</strong> {formatMemberSince(user?.memberSince || user?.createdAt)}</p>
           </div>
         </div>

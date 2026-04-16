@@ -35,6 +35,13 @@ const PostDetailPage = () => {
     angry: 'Angry'
   };
 
+  // Helper function para kumuha ng image URL (gumagana sa local at production)
+  const getImageUrl = (filename) => {
+    if (!filename) return null;
+    const baseUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    return `${baseUrl}/uploads/${filename}`;
+  };
+
   const fetchPostAndComments = useCallback(async () => {
     try {
       const [postRes, commentsRes] = await Promise.all([
@@ -149,22 +156,25 @@ const PostDetailPage = () => {
         <article className="post-detail" style={{ maxWidth: '800px', margin: '40px auto', background: 'pink', padding: '30px', borderRadius: '15px' }}>
           <h1>{post.title}</h1>
           <p className="post-meta">By {post.author?.name} | {new Date(post.createdAt).toLocaleDateString()}</p>
+          
+          {/* UPDATED: Image URL gamit ang helper function */}
           {post.image && (
-  <img 
-    src={`http://localhost:5000/uploads/${post.image}`} 
-    alt={post.title} 
-    style={{ 
-      width: '100%', 
-      maxHeight: '400px', 
-      objectFit: 'cover',
-      borderRadius: '10px', 
-      margin: '20px 0' 
-    }} 
-    onError={(e) => {
-      e.target.style.display = 'none';
-    }}
-  />
-)}
+            <img 
+              src={getImageUrl(post.image)} 
+              alt={post.title} 
+              style={{ 
+                width: '100%', 
+                maxHeight: '400px', 
+                objectFit: 'cover',
+                borderRadius: '10px', 
+                margin: '20px 0' 
+              }} 
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
+          
           <div className="post-body">
             <p style={{ textAlign: 'justify' }}>{post.body}</p>
           </div>
