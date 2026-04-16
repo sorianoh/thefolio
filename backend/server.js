@@ -21,31 +21,31 @@ connectDB().catch(err => {
   process.exit(1);
 });
 
-// ========== FIXED CORS CONFIGURATION - ITO ANG GAGANA ==========
+// ========== ULTIMATE CORS FIX - ITO ANG PINAKASURE ==========
 app.use((req, res, next) => {
-  // Allow specific origin
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://thefolio-tau-two.vercel.app',
-    'https://thefolio.vercel.app'
-  ];
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  
+  // Allow all origins (temporarily for testing)
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-HTTP-Method-Override, X-Forwarded-For');
   
-  // Handle preflight requests
+  // Handle preflight requests immediately
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    console.log('Preflight request received for:', req.path);
+    return res.status(200).end();
   }
+  
   next();
 });
-// ===============================================================
+
+// Also use cors middleware as backup
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With']
+}));
+// =============================================================
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -91,7 +91,7 @@ const server = app.listen(PORT, () => {
   console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 API Base URL: http://localhost:${PORT}/api\n`);
-  console.log(`✅ CORS enabled for: http://localhost:3000, https://thefolio-tau-two.vercel.app`);
+  console.log(`✅ CORS enabled - All origins allowed`);
 });
 
 // Handle graceful shutdown
