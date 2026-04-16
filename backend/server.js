@@ -21,18 +21,31 @@ connectDB().catch(err => {
   process.exit(1);
 });
 
-// ========== UPDATED CORS CONFIGURATION ==========
-// Allow all origins for testing (pinakasimple at siguradong gagana)
-app.use(cors({
-  origin: '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Handle preflight requests
-app.options('*', cors());
-// ================================================
+// ========== FIXED CORS CONFIGURATION - ITO ANG GAGANA ==========
+app.use((req, res, next) => {
+  // Allow specific origin
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://thefolio-tau-two.vercel.app',
+    'https://thefolio.vercel.app'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+// ===============================================================
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -78,7 +91,7 @@ const server = app.listen(PORT, () => {
   console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 API Base URL: http://localhost:${PORT}/api\n`);
-  console.log(`✅ CORS configured to accept requests from any origin`);
+  console.log(`✅ CORS enabled for: http://localhost:3000, https://thefolio-tau-two.vercel.app`);
 });
 
 // Handle graceful shutdown
