@@ -19,6 +19,14 @@ const PostCard = ({ post, onDelete, onReactionUpdate }) => {
     angry: '😠'
   };
 
+  // Helper function para kumuha ng image URL (gumagana sa local at production)
+  const getImageUrl = (filename) => {
+    if (!filename) return null;
+    // Kunin ang base URL mula sa environment variable o gamitin ang localhost
+    const baseUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    return `${baseUrl}/uploads/${filename}`;
+  };
+
   useEffect(() => {
     const fetchUserReaction = async () => {
       if (user && post?._id) {
@@ -60,10 +68,8 @@ const PostCard = ({ post, onDelete, onReactionUpdate }) => {
   const postBody = post?.body || '';
   const postExcerpt = postBody.length > 150 ? postBody.substring(0, 150) + '...' : postBody;
   
-  // Image URL - lahat ng users (admin, member, guest) makakakita
-  const imageUrl = post?.image && !imageError
-    ? `http://localhost:5000/uploads/${post.image}`
-    : null;
+  // Image URL - gamit ang helper function para gumana sa local at production
+  const imageUrl = post?.image && !imageError ? getImageUrl(post.image) : null;
 
   return (
     <div className="post-card">
