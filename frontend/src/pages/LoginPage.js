@@ -114,7 +114,7 @@ const LoginPage = () => {
           
           <div style={{ marginTop: '20px', fontSize: '12px', color: '#888', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
             <p style={{ margin: '5px 0', fontWeight: 'bold' }}>Demo Accounts:</p>
-            <p>📧 Admin: admin@thefolio.com | 🔑 Admin@1234</p>
+            <p>📧 Admin: admin2@thefolio.com | 🔑 Admin1234</p>
             <p>📧 Member: (register a new account)</p>
           </div>
         </div>
