@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 
@@ -21,34 +20,22 @@ connectDB().catch(err => {
   process.exit(1);
 });
 
-// ========== CORS CONFIGURATION - FIXED FOR RENDER ==========
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://thefolio-tau-two.vercel.app',
-  'https://thefolio.vercel.app'
-];
-
-// CORS middleware
+// CORS configuration
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+  origin: [
+    'http://localhost:3000',
+    'https://thefolio-tau-two.vercel.app',
+    'https://thefolio.vercel.app'
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded image files
+// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -59,7 +46,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/reactions', reactionRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Health check endpoint
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
@@ -69,37 +56,25 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
-  res.status(500).json({ 
-    message: 'Something went wrong!', 
-    error: err.message 
-  });
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'TheFolio API is running' });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({ message: `Route ${req.method} ${req.url} not found` });
 });
 
-// Start Server
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('❌ Error:', err.stack);
+  res.status(500).json({ message: 'Something went wrong!', error: err.message });
+});
+
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 API Base URL: http://localhost:${PORT}/api\n`);
-  console.log(`✅ CORS enabled for: ${allowedOrigins.join(', ')}`);
-});
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server');
-  server.close(() => {
-    console.log('HTTP server closed');
-    mongoose.connection.close(false, () => {
-      console.log('MongoDB connection closed');
-      process.exit(0);
-    });
-  });
 });
