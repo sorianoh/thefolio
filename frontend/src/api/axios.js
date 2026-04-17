@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Gamitin ang environment variable para sa API URL, fallback sa localhost kung wala
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// TEMPORARY: Hard coded URL for testing
+const API_URL = 'https://thefolio-nl1q.onrender.com/api';
 
 const instance = axios.create({
   baseURL: API_URL,
