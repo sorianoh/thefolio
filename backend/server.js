@@ -21,13 +21,14 @@ connectDB().catch(err => {
   process.exit(1);
 });
 
-// ========== CORS CONFIGURATION - FIXED ==========
+// ========== CORS CONFIGURATION - FIXED FOR RENDER ==========
 const allowedOrigins = [
   'http://localhost:3000',
   'https://thefolio-tau-two.vercel.app',
   'https://thefolio.vercel.app'
 ];
 
+// CORS middleware
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
@@ -43,9 +44,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-// ================================================
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
